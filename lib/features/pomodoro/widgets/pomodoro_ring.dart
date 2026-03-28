@@ -20,8 +20,8 @@ class PomodoroRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 250,
-      height: 250,
+      width: 248,
+      height: 248,
       child: CustomPaint(
         painter: _RingPainter(progress),
         child: Center(
@@ -30,16 +30,19 @@ class PomodoroRing extends StatelessWidget {
             children: <Widget>[
               Text(
                 timeLabel,
-                style: Theme.of(
-                  context,
-                ).textTheme.displayLarge?.copyWith(fontSize: 48),
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -1.2,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 subtitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: kLavender),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -59,13 +62,13 @@ class _RingPainter extends CustomPainter {
     final Offset center = size.center(Offset.zero);
     final double radius = size.width / 2 - 14;
     final Paint basePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = Colors.white.withValues(alpha: 0.16)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 12;
+      ..strokeWidth = 13;
     final Paint progressPaint = Paint()
-      ..color = kLavender
+      ..color = kLavenderBright
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 12
+      ..strokeWidth = 13
       ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, basePaint);
     canvas.drawArc(
