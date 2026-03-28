@@ -10,6 +10,11 @@ const Color kNavy = Color(0xFF273469);
 const Color kCoral = Color(0xFFEE6C4D);
 const Color kDark = Color(0xFF293241);
 const Color kInk = Color(0xFF20284A);
+const Color kCardSurface = Color(0xFFFDFBFF);
+const Color kCardSurfaceSoft = Color(0xFFF4EEFF);
+const Color kCardText = Color(0xFF1F2742);
+const Color kCardSubtext = Color(0xFF68748C);
+const Color kCardBorder = Color(0xFFE7E0F5);
 const Color kError = Color(0xFFEF4444);
 const Color kSuccess = Color(0xFF22C55E);
 const Color kWarning = Color(0xFFF59E0B);
@@ -27,9 +32,9 @@ final BorderRadius kInputRadius = BorderRadius.circular(30);
 final BorderRadius kCardRadius = BorderRadius.circular(24);
 final BorderRadius kButtonRadius = BorderRadius.circular(30);
 final Color kInputBg = Colors.white.withValues(alpha: 0.92);
-final Color kGlassSurface = Colors.white.withValues(alpha: 0.14);
-final Color kGlassSurfaceStrong = Colors.white.withValues(alpha: 0.2);
-final Color kGlassStroke = Colors.white.withValues(alpha: 0.16);
+final Color kGlassSurface = kCardSurface;
+final Color kGlassSurfaceStrong = kCardSurfaceSoft;
+final Color kGlassStroke = kCardBorder;
 final Color kMutedText = Colors.white.withValues(alpha: 0.72);
 
 class PlanoraTheme {
@@ -37,43 +42,43 @@ class PlanoraTheme {
 
   static ThemeData build() {
     final TextTheme textTheme = TextTheme(
-      displayLarge: GoogleFonts.spectral(
-        fontSize: 40,
+      displayLarge: GoogleFonts.cormorantGaramond(
+        fontSize: 44,
         fontWeight: FontWeight.w700,
         color: Colors.white,
-        height: 0.96,
+        height: 0.92,
       ),
-      titleLarge: GoogleFonts.spectral(
-        fontSize: 28,
+      titleLarge: GoogleFonts.cormorantGaramond(
+        fontSize: 34,
         fontWeight: FontWeight.w700,
         color: Colors.white,
-        height: 1,
+        height: 0.98,
       ),
-      titleMedium: GoogleFonts.ibmPlexSans(
+      titleMedium: GoogleFonts.workSans(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: Colors.white,
         letterSpacing: 0.1,
       ),
-      bodyLarge: GoogleFonts.ibmPlexSans(
+      bodyLarge: GoogleFonts.workSans(
         fontSize: 15,
         fontWeight: FontWeight.w400,
         color: Colors.white,
         height: 1.45,
       ),
-      bodyMedium: GoogleFonts.ibmPlexSans(
+      bodyMedium: GoogleFonts.workSans(
         fontSize: 13.5,
         fontWeight: FontWeight.w400,
         color: Colors.white,
         height: 1.4,
       ),
-      labelLarge: GoogleFonts.ibmPlexSans(
+      labelLarge: GoogleFonts.workSans(
         fontSize: 15,
         fontWeight: FontWeight.w600,
         color: kDark,
         letterSpacing: 0.2,
       ),
-      labelMedium: GoogleFonts.ibmPlexSans(
+      labelMedium: GoogleFonts.workSans(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         color: Colors.white,
@@ -117,10 +122,10 @@ class PlanoraTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: kInputBg,
-        hintStyle: GoogleFonts.ibmPlexSans(
-          fontSize: 14,
-          color: kInputHintColor,
-        ),
+        hintStyle: GoogleFonts.workSans(fontSize: 14, color: kInputHintColor),
+        labelStyle: GoogleFonts.workSans(fontSize: 14, color: kCardSubtext),
+        prefixIconColor: kCardSubtext,
+        suffixIconColor: kCardSubtext,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 24,
           vertical: 18,

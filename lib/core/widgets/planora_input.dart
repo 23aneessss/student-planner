@@ -79,7 +79,7 @@ class PlanoraDropdown<T> extends StatelessWidget {
       initialValue: value,
       decoration: InputDecoration(labelText: label, hintText: hint),
       dropdownColor: Colors.white,
-      iconEnabledColor: Colors.white,
+      iconEnabledColor: kDark,
       validator: validator,
       items: items,
       onChanged: onChanged,

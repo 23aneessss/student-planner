@@ -26,6 +26,9 @@ class HomeScreen extends ConsumerWidget {
     final String firstName =
         ref.watch(authProvider).valueOrNull?.user?.fullName.firstWord ??
         'Student';
+    final PomodoroController pomodoroController = ref.read(
+      pomodoroProvider.notifier,
+    );
     final AsyncValue<List<Task>> tasksAsync = ref.watch(rawTasksProvider);
     final AsyncValue<List<Course>> coursesAsync = ref.watch(
       coursesStreamProvider,
@@ -86,6 +89,14 @@ class HomeScreen extends ConsumerWidget {
                 dueToday: dueToday,
                 completedToday: pomodoro.completedToday,
                 onProfileTap: () => context.go('/profile'),
+              ),
+              const SizedBox(height: 18),
+              _FocusQuickActionCard(
+                state: pomodoro,
+                onOpen: () => context.go('/pomodoro'),
+                onPrimaryAction: pomodoro.isRunning
+                    ? pomodoroController.pause
+                    : pomodoroController.start,
               ),
               const SizedBox(height: 28),
               TodaySummaryCard(
@@ -397,20 +408,21 @@ class _TemplateChip extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: kCardSurface,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          border: Border.all(color: kCardBorder),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(
-              Icons.auto_awesome_rounded,
-              size: 16,
-              color: kLavenderBright,
-            ),
+            const Icon(Icons.auto_awesome_rounded, size: 16, color: kCoral),
             const SizedBox(width: 8),
-            Text(label, style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: kCardText),
+            ),
           ],
         ),
       ),
@@ -429,9 +441,9 @@ class _ScheduleCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: kCardSurface,
         borderRadius: kCardRadius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: kCardBorder),
       ),
       child: Row(
         children: <Widget>[
@@ -450,14 +462,16 @@ class _ScheduleCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   item.courseName,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: kCardText),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${item.start} - ${item.end}',
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(color: kMutedText),
+                  ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
                 ),
               ],
             ),
@@ -465,14 +479,10 @@ class _ScheduleCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: kCardSurfaceSoft,
               borderRadius: BorderRadius.circular(999),
             ),
-            child: const Icon(
-              Icons.north_east_rounded,
-              size: 16,
-              color: kLavenderBright,
-            ),
+            child: const Icon(Icons.north_east_rounded, size: 16, color: kInk),
           ),
         ],
       ),
@@ -491,15 +501,154 @@ class _EmptyGlow extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: kCardSurface,
         borderRadius: kCardRadius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: kCardBorder),
       ),
       child: Text(
         message,
         style: Theme.of(
           context,
-        ).textTheme.bodyMedium?.copyWith(color: kMutedText),
+        ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
+      ),
+    );
+  }
+}
+
+class _FocusQuickActionCard extends StatelessWidget {
+  const _FocusQuickActionCard({
+    required this.state,
+    required this.onPrimaryAction,
+    required this.onOpen,
+  });
+
+  final PomodoroState state;
+  final VoidCallback onPrimaryAction;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final String modeLabel = switch (state.mode) {
+      PomodoroMode.focus => 'Focus mode',
+      PomodoroMode.shortBreak => 'Short break',
+      PomodoroMode.longBreak => 'Long break',
+    };
+    final String timeLabel =
+        '${state.remaining.inMinutes.remainder(60).toString().padLeft(2, '0')}:${state.remaining.inSeconds.remainder(60).toString().padLeft(2, '0')}';
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: kCardSurface,
+        borderRadius: kCardRadius,
+        border: Border.all(color: kCardBorder),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: kInk.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: kCardSurfaceSoft,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.timer_outlined,
+                  color: kCoral,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Quick focus',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.copyWith(color: kCardText),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      modeLabel,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: kCardSurfaceSoft,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  timeLabel,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelMedium?.copyWith(color: kInk),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            state.isRunning
+                ? 'A session is already running. Pause it or open the full timer.'
+                : 'Bring Pomodoro forward and jump straight into a focus session.',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FilledButton(
+                  onPressed: onPrimaryAction,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(46),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  child: Text(state.isRunning ? 'Pause' : 'Start focus'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onOpen,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(46),
+                    foregroundColor: kCardText,
+                    side: const BorderSide(color: kCardBorder),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  child: const Text('Open timer'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

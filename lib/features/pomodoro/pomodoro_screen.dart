@@ -112,8 +112,9 @@ class PomodoroScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: kGlassSurface,
+              color: kCardSurface,
               borderRadius: kCardRadius,
+              border: Border.all(color: kCardBorder),
             ),
             child: Row(
               children: <Widget>[
@@ -123,14 +124,16 @@ class PomodoroScreen extends ConsumerWidget {
                     children: <Widget>[
                       Text(
                         'Today\'s sessions',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(color: kCardText),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '${state.completedToday} completed • ${state.totalMinutesToday} minutes',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.72),
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
                       ),
                     ],
                   ),

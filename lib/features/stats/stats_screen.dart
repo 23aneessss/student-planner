@@ -25,8 +25,9 @@ class StatsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: kGlassSurface,
+                color: kCardSurface,
                 borderRadius: kCardRadius,
+                border: Border.all(color: kCardBorder),
               ),
               child: SizedBox(
                 height: 220,
@@ -54,7 +55,7 @@ class StatsScreen extends ConsumerWidget {
                               Text(
                                 value.toInt().toString(),
                                 style: const TextStyle(
-                                  color: Colors.white70,
+                                  color: kCardSubtext,
                                   fontSize: 11,
                                 ),
                               ),
@@ -74,7 +75,7 @@ class StatsScreen extends ConsumerWidget {
                                   'S',
                                   'S',
                                 ][value.toInt()],
-                                style: const TextStyle(color: Colors.white70),
+                                style: const TextStyle(color: kCardSubtext),
                               ),
                         ),
                       ),
@@ -126,15 +127,18 @@ class StatsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: kGlassSurface,
+                color: kCardSurface,
                 borderRadius: kCardRadius,
+                border: Border.all(color: kCardBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     'Tasks completed',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium?.copyWith(color: kCardText),
                   ),
                   const SizedBox(height: 18),
                   SizedBox(
@@ -195,13 +199,19 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: kGlassSurface,
+        color: kCardSurface,
         borderRadius: kCardRadius,
+        border: Border.all(color: kCardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(title, style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: kCardSubtext),
+          ),
           const SizedBox(height: 10),
           Text(
             value,

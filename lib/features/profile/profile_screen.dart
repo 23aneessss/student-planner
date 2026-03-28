@@ -245,18 +245,71 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kGlassSurface,
+        color: kCardSurface,
         borderRadius: kCardRadius,
+        border: Border.all(color: kCardBorder),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          iconTheme: const IconThemeData(color: kCardText),
+          listTileTheme: const ListTileThemeData(
+            textColor: kCardText,
+            iconColor: kCardText,
           ),
-          child,
-        ],
+          segmentedButtonTheme: SegmentedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return kCoral;
+                }
+                return kCardSurfaceSoft;
+              }),
+              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white;
+                }
+                return kCardText;
+              }),
+              side: const WidgetStatePropertyAll(
+                BorderSide(color: kCardBorder),
+              ),
+            ),
+          ),
+          switchTheme: SwitchThemeData(
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Colors.white;
+              }
+              return Colors.white;
+            }),
+            trackColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return kSuccess;
+              }
+              return kCardBorder;
+            }),
+          ),
+        ),
+        child: DefaultTextStyle.merge(
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium!.copyWith(color: kCardText),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
+                child: Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: kCardText),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
       ),
     );
   }

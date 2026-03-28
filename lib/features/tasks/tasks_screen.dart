@@ -10,6 +10,7 @@ import '../../core/widgets/gradient_scaffold.dart';
 import '../../core/widgets/planora_input.dart';
 import '../../domain/models/task.dart';
 import '../../providers/tasks_provider.dart';
+import '../../theme/tokens.dart';
 import 'widgets/task_card.dart';
 import 'widgets/task_filter_bar.dart';
 
@@ -24,14 +25,33 @@ class TasksScreen extends ConsumerWidget {
 
     return GradientScaffold(
       clouds: const <CloudPosition>[CloudPosition.topRight],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/tasks/new'),
-        child: const Icon(Icons.add_rounded),
-      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 110),
         children: <Widget>[
-          Text('Tasks', style: Theme.of(context).textTheme.titleLarge),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  'Tasks',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => context.go('/tasks/new'),
+                child: Ink(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: kCardSurface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: kCardBorder),
+                  ),
+                  child: const Icon(Icons.add_rounded, color: kInk),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           TaskFilterBar(
             selectedStatus: status,

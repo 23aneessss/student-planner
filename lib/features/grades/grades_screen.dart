@@ -104,15 +104,18 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: kGlassSurface,
+                      color: kCardSurface,
                       borderRadius: kCardRadius,
+                      border: Border.all(color: kCardBorder),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
                           'Weighted GPA',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(color: kCardText),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -130,8 +133,9 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: kGlassSurface,
+                        color: kCardSurface,
                         borderRadius: kCardRadius,
+                        border: Border.all(color: kCardBorder),
                       ),
                       child: Row(
                         children: <Widget>[
@@ -141,19 +145,14 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
                               children: <Widget>[
                                 Text(
                                   grade.title,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(color: kCardText),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   '${grade.type.name} • ${grade.gradedAt.day}/${grade.gradedAt.month}/${grade.gradedAt.year}',
                                   style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.72,
-                                        ),
-                                      ),
+                                      ?.copyWith(color: kCardSubtext),
                                 ),
                               ],
                             ),

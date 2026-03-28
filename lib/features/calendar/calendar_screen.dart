@@ -46,8 +46,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: kGlassSurface,
+                  color: kCardSurface,
                   borderRadius: kCardRadius,
+                  border: Border.all(color: kCardBorder),
                 ),
                 child: TableCalendar<Task>(
                   firstDay: DateTime(2020),
@@ -118,7 +119,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       },
                   headerStyle: const HeaderStyle(
                     titleTextStyle: TextStyle(
-                      color: Colors.white,
+                      color: kCardText,
                       fontWeight: FontWeight.w700,
                     ),
                     leftChevronIcon: Icon(Icons.chevron_left, color: kLavender),
@@ -129,7 +130,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     formatButtonVisible: false,
                   ),
                   calendarStyle: CalendarStyle(
-                    defaultTextStyle: const TextStyle(color: Colors.white),
+                    defaultTextStyle: const TextStyle(color: kCardText),
                     weekendTextStyle: const TextStyle(color: kCoral),
                     selectedDecoration: const BoxDecoration(
                       color: kLavender,

@@ -23,21 +23,14 @@ class TaskCard extends StatelessWidget {
         borderRadius: kCardRadius,
         child: Ink(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                Colors.white.withValues(alpha: 0.18),
-                Colors.white.withValues(alpha: 0.07),
-              ],
-            ),
+            color: kCardSurface,
             borderRadius: kCardRadius,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            border: Border.all(color: kCardBorder),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, 14),
+                color: kInk.withValues(alpha: 0.1),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -66,6 +59,10 @@ class TaskCard extends StatelessWidget {
                       value: isDone,
                       onChanged: (_) => onToggle?.call(),
                       activeColor: kLavenderBright,
+                      side: BorderSide(
+                        color: kCardSubtext.withValues(alpha: 0.34),
+                        width: 1.2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -88,10 +85,10 @@ class TaskCard extends StatelessWidget {
                                             ? TextDecoration.lineThrough
                                             : null,
                                         color: isDone
-                                            ? Colors.white.withValues(
+                                            ? kCardSubtext.withValues(
                                                 alpha: 0.64,
                                               )
-                                            : Colors.white,
+                                            : kCardText,
                                       ),
                                 ),
                               ),
@@ -107,7 +104,7 @@ class TaskCard extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: kMutedText),
+                                  ?.copyWith(color: kCardSubtext),
                             ),
                           ],
                           const SizedBox(height: 14),
@@ -115,7 +112,7 @@ class TaskCard extends StatelessWidget {
                             isDone ? 'Completed' : 'Next up',
                             style: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                  color: kCardSubtext,
                                   letterSpacing: 1,
                                 ),
                           ),
@@ -127,10 +124,9 @@ class TaskCard extends StatelessWidget {
                               if (task.dueDate != null)
                                 _Pill(
                                   label: task.dueDate!.weekdayAndDate,
-                                  background: Colors.white.withValues(
-                                    alpha: 0.08,
-                                  ),
+                                  background: kCardSurfaceSoft,
                                   icon: Icons.event_outlined,
+                                  textColor: kCardText,
                                 ),
                               _Pill(
                                 label: task.priority.name.capitalized,
@@ -142,10 +138,9 @@ class TaskCard extends StatelessWidget {
                               if (task.description?.isNotEmpty ?? false)
                                 _Pill(
                                   label: 'Has notes',
-                                  background: Colors.white.withValues(
-                                    alpha: 0.06,
-                                  ),
+                                  background: kCardSurfaceSoft,
                                   icon: Icons.notes_rounded,
+                                  textColor: kCardText,
                                 ),
                             ],
                           ),
@@ -165,7 +160,7 @@ class TaskCard extends StatelessWidget {
   Color _priorityColor(TaskPriority priority) {
     switch (priority) {
       case TaskPriority.low:
-        return Colors.white.withValues(alpha: 0.25);
+        return kCardSurfaceSoft;
       case TaskPriority.medium:
         return kLavender;
       case TaskPriority.high:
@@ -225,7 +220,7 @@ class _PriorityHalo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color = switch (priority) {
-      TaskPriority.low => Colors.white.withValues(alpha: 0.4),
+      TaskPriority.low => kCardBorder,
       TaskPriority.medium => kLavenderBright,
       TaskPriority.high => kCoral,
       TaskPriority.urgent => kError,

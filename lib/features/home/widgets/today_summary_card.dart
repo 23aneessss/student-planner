@@ -21,23 +21,26 @@ class TodaySummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            Colors.white.withValues(alpha: 0.2),
-            Colors.white.withValues(alpha: 0.08),
-          ],
-        ),
+        color: kCardSurface,
         borderRadius: kCardRadius,
         border: Border.all(color: kGlassStroke),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: kInk.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text('Today\'s summary', style: textTheme.titleMedium),
+              Text(
+                'Today\'s summary',
+                style: textTheme.titleMedium?.copyWith(color: kCardText),
+              ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -45,14 +48,12 @@ class TodaySummaryCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: kCardSurfaceSoft,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   'Pulse',
-                  style: textTheme.labelMedium?.copyWith(
-                    color: kLavenderBright,
-                  ),
+                  style: textTheme.labelMedium?.copyWith(color: kCoral),
                 ),
               ),
             ],
@@ -68,6 +69,7 @@ class TodaySummaryCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: kGlassSurfaceStrong,
                     borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: kCardBorder),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,13 +78,15 @@ class TodaySummaryCard extends StatelessWidget {
                         '$tasksDueToday',
                         style: textTheme.displayLarge?.copyWith(
                           fontSize: 34,
-                          color: kLavenderBright,
+                          color: kLavender,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         'Tasks due before midnight',
-                        style: textTheme.titleMedium,
+                        style: textTheme.titleMedium?.copyWith(
+                          color: kCardText,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -90,7 +94,7 @@ class TodaySummaryCard extends StatelessWidget {
                             ? 'You have room to focus deeper today.'
                             : 'Keep the queue light and finish the most important one first.',
                         style: textTheme.bodyMedium?.copyWith(
-                          color: kMutedText,
+                          color: kCardSubtext,
                         ),
                       ),
                     ],
@@ -146,8 +150,9 @@ class _StatChip extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: kCardSurfaceSoft,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: kCardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +161,10 @@ class _StatChip extends StatelessWidget {
           const SizedBox(height: 12),
           Text(value, style: textTheme.titleLarge?.copyWith(color: accent)),
           const SizedBox(height: 2),
-          Text(label, style: textTheme.bodyMedium?.copyWith(color: kMutedText)),
+          Text(
+            label,
+            style: textTheme.bodyMedium?.copyWith(color: kCardSubtext),
+          ),
         ],
       ),
     );

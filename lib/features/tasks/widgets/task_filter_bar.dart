@@ -59,16 +59,19 @@ class TaskFilterBar extends StatelessWidget {
         const SizedBox(width: 12),
         DecoratedBox(
           decoration: BoxDecoration(
-            color: kGlassSurface,
+            color: kCardSurface,
             borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: kCardBorder),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<TaskSort>(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               value: sort,
-              dropdownColor: kDark,
-              iconEnabledColor: Colors.white,
-              style: Theme.of(context).textTheme.bodyMedium,
+              dropdownColor: kCardSurface,
+              iconEnabledColor: kCardText,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: kCardText),
               items: const <DropdownMenuItem<TaskSort>>[
                 DropdownMenuItem(
                   value: TaskSort.dueDate,
@@ -103,10 +106,11 @@ class TaskFilterBar extends StatelessWidget {
       child: ChoiceChip(
         label: Text(label),
         selected: selected,
-        selectedColor: kLavender,
-        backgroundColor: Colors.white.withValues(alpha: 0.08),
+        selectedColor: kLavenderBright,
+        backgroundColor: kCardSurface,
+        side: const BorderSide(color: kCardBorder),
         labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: selected ? kDark : Colors.white,
+          color: selected ? kInk : kCardText,
           fontWeight: FontWeight.w600,
         ),
         onSelected: (_) => onTap(),
