@@ -42,47 +42,49 @@ class PlanoraTheme {
 
   static ThemeData build() {
     final TextTheme textTheme = TextTheme(
-      displayLarge: GoogleFonts.cormorantGaramond(
-        fontSize: 44,
-        fontWeight: FontWeight.w700,
+      displayLarge: GoogleFonts.manrope(
+        fontSize: 38,
+        fontWeight: FontWeight.w800,
         color: Colors.white,
-        height: 0.92,
+        height: 1.02,
+        letterSpacing: -0.8,
       ),
-      titleLarge: GoogleFonts.cormorantGaramond(
-        fontSize: 34,
-        fontWeight: FontWeight.w700,
+      titleLarge: GoogleFonts.manrope(
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
         color: Colors.white,
-        height: 0.98,
+        height: 1.04,
+        letterSpacing: -0.5,
       ),
-      titleMedium: GoogleFonts.workSans(
+      titleMedium: GoogleFonts.manrope(
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: Colors.white,
-        letterSpacing: 0.1,
+        letterSpacing: -0.2,
       ),
-      bodyLarge: GoogleFonts.workSans(
+      bodyLarge: GoogleFonts.manrope(
+        fontSize: 15.5,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+        height: 1.42,
+      ),
+      bodyMedium: GoogleFonts.manrope(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+        height: 1.38,
+      ),
+      labelLarge: GoogleFonts.manrope(
         fontSize: 15,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-        height: 1.45,
-      ),
-      bodyMedium: GoogleFonts.workSans(
-        fontSize: 13.5,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-        height: 1.4,
-      ),
-      labelLarge: GoogleFonts.workSans(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: kDark,
-        letterSpacing: 0.2,
+        letterSpacing: 0,
       ),
-      labelMedium: GoogleFonts.workSans(
+      labelMedium: GoogleFonts.manrope(
         fontSize: 12,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: Colors.white,
-        letterSpacing: 0.8,
+        letterSpacing: 0.2,
       ),
     );
 
@@ -122,8 +124,8 @@ class PlanoraTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: kInputBg,
-        hintStyle: GoogleFonts.workSans(fontSize: 14, color: kInputHintColor),
-        labelStyle: GoogleFonts.workSans(fontSize: 14, color: kCardSubtext),
+        hintStyle: GoogleFonts.manrope(fontSize: 14, color: kInputHintColor),
+        labelStyle: GoogleFonts.manrope(fontSize: 14, color: kCardSubtext),
         prefixIconColor: kCardSubtext,
         suffixIconColor: kCardSubtext,
         contentPadding: const EdgeInsets.symmetric(
