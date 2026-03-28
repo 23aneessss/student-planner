@@ -1,0 +1,27 @@
+{
+  "name": "Weekly Review",
+  "description": "Close the week with reflection, cleanup, and planning.",
+  "tasks": [
+    {
+      "title": "Archive completed work",
+      "priority": 1,
+      "dueOffset": 0,
+      "tags": ["review"],
+      "recurrence": {"freq": "weekly"}
+    },
+    {
+      "title": "Plan next week priorities",
+      "priority": 2,
+      "dueOffset": 1,
+      "tags": ["planning"],
+      "recurrence": {"freq": "weekly"}
+    },
+    {
+      "title": "Check grade progress",
+      "priority": 1,
+      "dueOffset": 1,
+      "tags": ["grades"],
+      "recurrence": {"freq": "weekly"}
+    }
+  ]
+}

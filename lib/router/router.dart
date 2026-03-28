@@ -1,0 +1,166 @@
+// lib/router/router.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../features/auth/sign_in_screen.dart';
+import '../features/auth/sign_up_screen.dart';
+import '../features/calendar/calendar_screen.dart';
+import '../features/grades/grades_screen.dart';
+import '../features/home/home_screen.dart';
+import '../features/onboarding/onboarding_screen.dart';
+import '../features/pomodoro/pomodoro_screen.dart';
+import '../features/profile/profile_screen.dart';
+import '../features/stats/stats_screen.dart';
+import '../features/tasks/task_detail_screen.dart';
+import '../features/tasks/tasks_screen.dart';
+import '../providers/app_providers.dart';
+import '../providers/auth_provider.dart';
+import '../theme/tokens.dart';
+
+GoRouter createRouter(WidgetRef ref) {
+  final AsyncValue<AuthState> auth = ref.watch(authProvider);
+  final bool onboardingDone = ref.watch(onboardingProvider);
+
+  return GoRouter(
+    initialLocation: '/',
+    redirect: (BuildContext context, GoRouterState state) {
+      final String location = state.matchedLocation;
+      final bool authPath = location == '/sign-in' || location == '/sign-up';
+      if (!onboardingDone && location != '/onboarding') {
+        return '/onboarding';
+      }
+      if (auth.isLoading) {
+        return null;
+      }
+      final bool isAuthenticated = auth.valueOrNull?.isAuthenticated ?? false;
+      if (!isAuthenticated && !authPath && location != '/onboarding') {
+        return '/sign-in';
+      }
+      if (isAuthenticated && authPath) {
+        return '/';
+      }
+      return null;
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        path: '/onboarding',
+        builder: (BuildContext context, GoRouterState state) =>
+            const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/sign-in',
+        builder: (BuildContext context, GoRouterState state) =>
+            const SignInScreen(),
+      ),
+      GoRoute(
+        path: '/sign-up',
+        builder: (BuildContext context, GoRouterState state) =>
+            const SignUpScreen(),
+      ),
+      ShellRoute(
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return MainShellScaffold(child: child);
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: '/',
+            builder: (BuildContext context, GoRouterState state) =>
+                const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/tasks',
+            builder: (BuildContext context, GoRouterState state) =>
+                const TasksScreen(),
+            routes: <RouteBase>[
+              GoRoute(
+                path: ':id',
+                builder: (BuildContext context, GoRouterState state) =>
+                    TaskDetailScreen(taskId: state.pathParameters['id']!),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/calendar',
+            builder: (BuildContext context, GoRouterState state) =>
+                const CalendarScreen(),
+          ),
+          GoRoute(
+            path: '/pomodoro',
+            builder: (BuildContext context, GoRouterState state) =>
+                const PomodoroScreen(),
+          ),
+          GoRoute(
+            path: '/stats',
+            builder: (BuildContext context, GoRouterState state) =>
+                const StatsScreen(),
+          ),
+          GoRoute(
+            path: '/grades',
+            builder: (BuildContext context, GoRouterState state) =>
+                const GradesScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (BuildContext context, GoRouterState state) =>
+                const ProfileScreen(),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+class MainShellScaffold extends StatelessWidget {
+  const MainShellScaffold({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final String location = GoRouterState.of(context).matchedLocation;
+    final List<String> tabs = <String>[
+      '/',
+      '/tasks',
+      '/calendar',
+      '/pomodoro',
+      '/stats',
+    ];
+    final int index = tabs.indexWhere(
+      (String tab) => location == tab || location.startsWith('$tab/'),
+    );
+
+    return Scaffold(
+      extendBody: true,
+      backgroundColor: Colors.transparent,
+      body: child,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: index < 0 ? 0 : index,
+        onTap: (int value) => context.go(tabs[value]),
+        backgroundColor: kDark,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_rounded),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer_outlined),
+            label: 'Pomodoro',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.auto_graph_rounded),
+            label: 'Stats',
+          ),
+        ],
+      ),
+    );
+  }
+}

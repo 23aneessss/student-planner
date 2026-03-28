@@ -1,0 +1,68 @@
+name: planora
+description: "PLANORA student planner. Plan. Focus. Progress."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  hooks_riverpod: ^2.5.1
+  flutter_hooks: ^0.20.5
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+  drift: ^2.18.0
+  drift_flutter: ^0.2.0
+  sqlite3_flutter_libs: ^0.5.24
+  path_provider: ^2.1.3
+  path: ^1.9.1
+  dio: ^5.8.0+1
+  flutter_secure_storage: ^9.2.2
+  flutter_local_notifications: ^17.2.4
+  go_router: ^14.8.1
+  intl: ^0.20.2
+  table_calendar: ^3.1.3
+  fl_chart: ^0.70.2
+  lottie: ^3.3.1
+  google_sign_in: ^6.3.0
+  flutter_svg: ^2.0.17
+  shared_preferences: ^2.5.3
+  uuid: ^4.5.1
+  connectivity_plus: ^6.1.4
+  file_picker: ^8.3.2
+  share_plus: ^10.1.4
+  timezone: ^0.9.4
+  cached_network_image: ^3.4.1
+  google_fonts: ^6.2.1
+  collection: ^1.19.1
+  csv: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  build_runner: ^2.4.9
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  drift_dev: ^2.18.0
+  riverpod_generator: ^2.4.0
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
+  mocktail: ^1.0.4
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/cloud.png
+    - assets/icons/google.svg
+    - assets/lottie/pomodoro_fire.json
+    - assets/templates/exam_week.json
+    - assets/templates/project_sprint.json
+    - assets/templates/weekly_review.json
