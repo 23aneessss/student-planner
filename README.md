@@ -48,6 +48,19 @@ flutter run \
   --dart-define=GOOGLE_SIGN_IN_ENABLED=true
 ```
 
+## Custom Art Assets
+
+Drop your own UI art into these exact paths:
+
+- Background: `assets/images/backgrounds/home_shell_bg.png`
+- Bottom bar icons: `assets/icons/nav/home.png`
+- Bottom bar icons: `assets/icons/nav/tasks.png`
+- Bottom bar icons: `assets/icons/nav/calendar.png`
+- Bottom bar icons: `assets/icons/nav/stats.png`
+- Bottom bar icons: `assets/icons/nav/profile.png`
+
+The app now uses your background image on the home shell when that file exists, and falls back to the built-in gradient if it does not. The bottom action bar also prefers your icon PNGs and falls back to Flutter icons until you replace them.
+
 ## Docs
 
 - Product spec: [`.agent/prompt.md`](/Users/mac/Desktop/CODE/student-planner/.agent/prompt.md)

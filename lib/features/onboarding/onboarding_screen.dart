@@ -48,6 +48,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(
+      usePrimaryBackground: false,
       clouds: const <CloudPosition>[
         CloudPosition.topRight,
         CloudPosition.bottomLeft,

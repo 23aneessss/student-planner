@@ -25,6 +25,13 @@ const String kLastSyncKey = 'last_sync_ms';
 const String kProfileKey = 'user_profile_json';
 const String kAccessTokenKey = 'access_token';
 const String kRefreshTokenKey = 'refresh_token';
+const String kPrimaryBackgroundAsset =
+    'assets/images/backgrounds/home_shell_bg.png';
+const String kNavHomeIconAsset = 'assets/icons/nav/home.png';
+const String kNavTasksIconAsset = 'assets/icons/nav/tasks.png';
+const String kNavCalendarIconAsset = 'assets/icons/nav/calendar.png';
+const String kNavStatsIconAsset = 'assets/icons/nav/stats.png';
+const String kNavProfileIconAsset = 'assets/icons/nav/profile.png';
 
 const List<String> kScholarYearOptions = <String>[
   '1st Year',

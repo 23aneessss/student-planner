@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants.dart';
 import '../../core/extensions.dart';
-import '../../core/widgets/cloud_decoration.dart';
 import '../../core/widgets/gradient_scaffold.dart';
 import '../../domain/models/course.dart';
 import '../../domain/models/task.dart';
@@ -35,16 +34,7 @@ class HomeScreen extends ConsumerWidget {
     final SyncState syncState = ref.watch(syncProvider);
 
     return GradientScaffold(
-      clouds: const <CloudPosition>[
-        CloudPosition.topRight,
-        CloudPosition.bottomLeft,
-      ],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kLavender,
-        foregroundColor: kDark,
-        onPressed: () => context.go('/tasks/new'),
-        child: const Icon(Icons.add_rounded),
-      ),
+      backgroundImageAsset: kPrimaryBackgroundAsset,
       body: tasksAsync.when(
         data: (List<Task> tasks) {
           final List<Task> upcoming = tasks.take(6).toList();
@@ -57,8 +47,11 @@ class HomeScreen extends ConsumerWidget {
           final int streak = tasks
               .where((Task task) => task.status == TaskStatus.done)
               .length;
+          final String todayLabel = DateFormat(
+            'EEEE, d MMMM',
+          ).format(DateTime.now());
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 110),
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 128),
             children: <Widget>[
               if (syncState.phase == SyncPhase.syncing) ...<Widget>[
                 Container(
@@ -68,62 +61,49 @@ class HomeScreen extends ConsumerWidget {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: kLavender,
-                    borderRadius: BorderRadius.circular(14),
+                    color: kLavenderBright.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Text(
-                    'Syncing your planner…',
-                    style: TextStyle(color: kDark, fontWeight: FontWeight.w700),
+                  child: Row(
+                    children: <Widget>[
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Syncing your planner...',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                    ],
                   ),
                 ),
               ],
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Good morning, $firstName',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          DateFormat('EEEE, d MMMM').format(DateTime.now()),
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: kLavender),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => context.go('/profile'),
-                    icon: const Icon(
-                      Icons.person_outline_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              _HomeHero(
+                firstName: firstName,
+                todayLabel: todayLabel,
+                dueToday: dueToday,
+                completedToday: pomodoro.completedToday,
+                onProfileTap: () => context.go('/profile'),
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 28),
               TodaySummaryCard(
                 tasksDueToday: dueToday,
                 sessionsLogged: pomodoro.completedToday,
                 streakDays: streak,
               ),
               const SizedBox(height: 26),
-              _sectionHeader(
-                context,
+              _SectionHeader(
                 'Upcoming tasks',
                 'View all',
                 () => context.go('/tasks'),
               ),
               const SizedBox(height: 14),
               SizedBox(
-                height: 190,
+                height: 214,
                 child: upcoming.isEmpty
-                    ? const Center(child: Text('No upcoming tasks yet.'))
+                    ? const _EmptyGlow(message: 'No upcoming tasks yet.')
                     : ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: upcoming.length,
@@ -145,24 +125,20 @@ class HomeScreen extends ConsumerWidget {
                       ),
               ),
               const SizedBox(height: 26),
-              _sectionHeader(context, 'Templates', 'Apply', () {}),
+              _SectionHeader('Templates', 'Apply', () {}),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children: kTemplateAssets
                     .map(
-                      (String asset) => ActionChip(
-                        backgroundColor: Colors.white.withValues(alpha: 0.12),
-                        label: Text(
-                          asset
-                              .split('/')
-                              .last
-                              .replaceAll('.json', '')
-                              .replaceAll('_', ' '),
-                        ),
-                        labelStyle: const TextStyle(color: Colors.white),
-                        onPressed: () => ref
+                      (String asset) => _TemplateChip(
+                        label: asset
+                            .split('/')
+                            .last
+                            .replaceAll('.json', '')
+                            .replaceAll('_', ' '),
+                        onTap: () => ref
                             .read(taskActionsProvider)
                             .applyTemplateFromAsset(asset),
                       ),
@@ -170,67 +146,26 @@ class HomeScreen extends ConsumerWidget {
                     .toList(),
               ),
               const SizedBox(height: 26),
-              _sectionHeader(context, 'Today\'s schedule', 'Sync now', () {
+              _SectionHeader('Today\'s schedule', 'Sync now', () {
                 ref.read(syncProvider.notifier).syncNow();
               }),
               const SizedBox(height: 14),
               coursesAsync.when(
-                data: (List<Course> courses) => Column(
-                  children: _scheduleForToday(courses)
-                      .map(
-                        (_ScheduleItem item) => Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: kGlassSurface,
-                            borderRadius: kCardRadius,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: Color(
-                                    int.parse(
-                                      item.colorHex.replaceFirst('#', '0xFF'),
-                                    ),
-                                  ),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      item.courseName,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${item.start} - ${item.end}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.72,
-                                            ),
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
+                data: (List<Course> courses) {
+                  final List<_ScheduleItem> schedule = _scheduleForToday(
+                    courses,
+                  );
+                  if (schedule.isEmpty) {
+                    return const _EmptyGlow(
+                      message: 'No classes scheduled for today.',
+                    );
+                  }
+                  return Column(
+                    children: schedule
+                        .map((_ScheduleItem item) => _ScheduleCard(item: item))
+                        .toList(),
+                  );
+                },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace stackTrace) =>
                     Text(error.toString()),
@@ -242,22 +177,6 @@ class HomeScreen extends ConsumerWidget {
         error: (Object error, StackTrace stackTrace) =>
             Center(child: Text(error.toString())),
       ),
-    );
-  }
-
-  Widget _sectionHeader(
-    BuildContext context,
-    String title,
-    String action,
-    VoidCallback onPressed,
-  ) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ),
-        TextButton(onPressed: onPressed, child: Text(action)),
-      ],
     );
   }
 
@@ -292,4 +211,296 @@ class _ScheduleItem {
   final String colorHex;
   final String start;
   final String end;
+}
+
+class _HomeHero extends StatelessWidget {
+  const _HomeHero({
+    required this.firstName,
+    required this.todayLabel,
+    required this.dueToday,
+    required this.completedToday,
+    required this.onProfileTap,
+  });
+
+  final String firstName;
+  final String todayLabel;
+  final int dueToday;
+  final int completedToday;
+  final VoidCallback onProfileTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            _HeroCapsule(
+              icon: Icons.calendar_month_outlined,
+              label: todayLabel,
+            ),
+            const Spacer(),
+            InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: onProfileTap,
+              child: Ink(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: const Icon(Icons.person_outline_rounded, size: 20),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Text('Good morning,\n$firstName', style: textTheme.displayLarge),
+        const SizedBox(height: 12),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 280),
+          child: Text(
+            dueToday == 0
+                ? 'A quiet canvas today. Use the calm to make progress that compounds.'
+                : '$dueToday tasks are waiting. You have logged $completedToday focus sessions so far.',
+            style: textTheme.bodyLarge?.copyWith(color: kMutedText),
+          ),
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: <Widget>[
+            _HeroCapsule(
+              icon: Icons.bolt_rounded,
+              label: dueToday == 0 ? 'Clear horizon' : '$dueToday due today',
+              emphasis: true,
+            ),
+            const SizedBox(width: 10),
+            _HeroCapsule(
+              icon: Icons.timer_outlined,
+              label: '$completedToday focus sessions',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _HeroCapsule extends StatelessWidget {
+  const _HeroCapsule({
+    required this.icon,
+    required this.label,
+    this.emphasis = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool emphasis;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: emphasis
+            ? kLavenderBright.withValues(alpha: 0.88)
+            : Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: emphasis
+              ? Colors.white.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 16, color: emphasis ? kInk : Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: emphasis ? kInk : Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title, this.action, this.onPressed);
+
+  final String title;
+  final String action;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        ),
+        InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: onPressed,
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  action,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelMedium?.copyWith(color: kLavenderBright),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.arrow_outward_rounded,
+                  size: 14,
+                  color: kLavenderBright,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TemplateChip extends StatelessWidget {
+  const _TemplateChip({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Ink(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(
+              Icons.auto_awesome_rounded,
+              size: 16,
+              color: kLavenderBright,
+            ),
+            const SizedBox(width: 8),
+            Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScheduleCard extends StatelessWidget {
+  const _ScheduleCard({required this.item});
+
+  final _ScheduleItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: kCardRadius,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 12,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Color(int.parse(item.colorHex.replaceFirst('#', '0xFF'))),
+              borderRadius: BorderRadius.circular(100),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  item.courseName,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.start} - ${item.end}',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: kMutedText),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Icon(
+              Icons.north_east_rounded,
+              size: 16,
+              color: kLavenderBright,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyGlow extends StatelessWidget {
+  const _EmptyGlow({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: kCardRadius,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Text(
+        message,
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: kMutedText),
+      ),
+    );
+  }
 }

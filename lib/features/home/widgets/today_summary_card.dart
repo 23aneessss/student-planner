@@ -21,21 +21,103 @@ class TodaySummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: kGlassSurface,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Colors.white.withValues(alpha: 0.2),
+            Colors.white.withValues(alpha: 0.08),
+          ],
+        ),
         borderRadius: kCardRadius,
+        border: Border.all(color: kGlassStroke),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Today\'s summary', style: textTheme.titleMedium),
-          const SizedBox(height: 16),
           Row(
             children: <Widget>[
-              _StatChip(label: 'Due', value: '$tasksDueToday'),
+              Text('Today\'s summary', style: textTheme.titleMedium),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'Pulse',
+                  style: textTheme.labelMedium?.copyWith(
+                    color: kLavenderBright,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                flex: 5,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: kGlassSurfaceStrong,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '$tasksDueToday',
+                        style: textTheme.displayLarge?.copyWith(
+                          fontSize: 34,
+                          color: kLavenderBright,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tasks due before midnight',
+                        style: textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        tasksDueToday == 0
+                            ? 'You have room to focus deeper today.'
+                            : 'Keep the queue light and finish the most important one first.',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: kMutedText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(width: 12),
-              _StatChip(label: 'Sessions', value: '$sessionsLogged'),
-              const SizedBox(width: 12),
-              _StatChip(label: 'Streak', value: '$streakDays'),
+              Expanded(
+                flex: 4,
+                child: Column(
+                  children: <Widget>[
+                    _StatChip(
+                      label: 'Sessions',
+                      value: '$sessionsLogged',
+                      accent: const Color(0xFFBFE5FF),
+                      icon: Icons.timer_outlined,
+                    ),
+                    const SizedBox(height: 12),
+                    _StatChip(
+                      label: 'Streak',
+                      value: '$streakDays',
+                      accent: const Color(0xFFFFC998),
+                      icon: Icons.local_fire_department_outlined,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -45,36 +127,37 @@ class TodaySummaryCard extends StatelessWidget {
 }
 
 class _StatChip extends StatelessWidget {
-  const _StatChip({required this.label, required this.value});
+  const _StatChip({
+    required this.label,
+    required this.value,
+    required this.accent,
+    required this.icon,
+  });
 
   final String label;
   final String value;
+  final Color accent;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          children: <Widget>[
-            Text(
-              value,
-              style: textTheme.titleLarge?.copyWith(color: kLavender),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
-        ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Icon(icon, size: 18, color: accent),
+          const SizedBox(height: 12),
+          Text(value, style: textTheme.titleLarge?.copyWith(color: accent)),
+          const SizedBox(height: 2),
+          Text(label, style: textTheme.bodyMedium?.copyWith(color: kMutedText)),
+        ],
       ),
     );
   }

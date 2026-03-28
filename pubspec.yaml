@@ -60,9 +60,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/cloud.png
-    - assets/icons/google.svg
-    - assets/lottie/pomodoro_fire.json
-    - assets/templates/exam_week.json
-    - assets/templates/project_sprint.json
-    - assets/templates/weekly_review.json
+    - assets/images/
+    - assets/images/backgrounds/
+    - assets/icons/
+    - assets/icons/nav/
+    - assets/lottie/
+    - assets/templates/

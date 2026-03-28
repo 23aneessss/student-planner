@@ -14,9 +14,10 @@ import '../features/profile/profile_screen.dart';
 import '../features/stats/stats_screen.dart';
 import '../features/tasks/task_detail_screen.dart';
 import '../features/tasks/tasks_screen.dart';
+import '../core/constants.dart';
+import '../core/widgets/planora_bottom_action_bar.dart';
 import '../providers/app_providers.dart';
 import '../providers/auth_provider.dart';
-import '../theme/tokens.dart';
 
 GoRouter createRouter(WidgetRef ref) {
   final AsyncValue<AuthState> auth = ref.watch(authProvider);
@@ -119,47 +120,52 @@ class MainShellScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String location = GoRouterState.of(context).matchedLocation;
-    final List<String> tabs = <String>[
-      '/',
-      '/tasks',
-      '/calendar',
-      '/pomodoro',
-      '/stats',
+    final List<PlanoraNavItem> tabs = <PlanoraNavItem>[
+      const PlanoraNavItem(
+        label: 'Home',
+        route: '/',
+        assetPath: kNavHomeIconAsset,
+        fallbackIcon: Icons.home_outlined,
+      ),
+      const PlanoraNavItem(
+        label: 'Tasks',
+        route: '/tasks',
+        assetPath: kNavTasksIconAsset,
+        fallbackIcon: Icons.task_alt_outlined,
+      ),
+      const PlanoraNavItem(
+        label: 'Calendar',
+        route: '/calendar',
+        assetPath: kNavCalendarIconAsset,
+        fallbackIcon: Icons.calendar_month_outlined,
+      ),
+      const PlanoraNavItem(
+        label: 'Stats',
+        route: '/stats',
+        assetPath: kNavStatsIconAsset,
+        fallbackIcon: Icons.bar_chart_rounded,
+      ),
+      const PlanoraNavItem(
+        label: 'Profile',
+        route: '/profile',
+        assetPath: kNavProfileIconAsset,
+        fallbackIcon: Icons.person_outline_rounded,
+      ),
     ];
     final int index = tabs.indexWhere(
-      (String tab) => location == tab || location.startsWith('$tab/'),
+      (PlanoraNavItem tab) => tab.route == '/'
+          ? location == tab.route
+          : location == tab.route || location.startsWith('${tab.route}/'),
     );
 
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.transparent,
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: PlanoraBottomActionBar(
+        items: tabs,
         currentIndex: index < 0 ? 0 : index,
-        onTap: (int value) => context.go(tabs[value]),
-        backgroundColor: kDark,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check_circle_outline),
-            label: 'Tasks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.timer_outlined),
-            label: 'Pomodoro',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_graph_rounded),
-            label: 'Stats',
-          ),
-        ],
+        onSelected: (int value) => context.go(tabs[value].route),
       ),
     );
   }

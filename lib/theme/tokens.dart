@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const Color kCanvas = Color(0xFFFAFAFF);
+const Color kMoon = Color(0xFFF4F0FF);
 const Color kLavender = Color(0xFFC8B3FD);
+const Color kLavenderBright = Color(0xFFDCC9FF);
 const Color kNavy = Color(0xFF273469);
 const Color kCoral = Color(0xFFEE6C4D);
 const Color kDark = Color(0xFF293241);
+const Color kInk = Color(0xFF20284A);
 const Color kError = Color(0xFFEF4444);
 const Color kSuccess = Color(0xFF22C55E);
 const Color kWarning = Color(0xFFF59E0B);
@@ -21,45 +24,60 @@ final LinearGradient kBgGradient = const LinearGradient(
 );
 
 final BorderRadius kInputRadius = BorderRadius.circular(30);
-final BorderRadius kCardRadius = BorderRadius.circular(16);
+final BorderRadius kCardRadius = BorderRadius.circular(24);
 final BorderRadius kButtonRadius = BorderRadius.circular(30);
 final Color kInputBg = Colors.white.withValues(alpha: 0.92);
-final Color kGlassSurface = kCanvas.withValues(alpha: 0.12);
+final Color kGlassSurface = Colors.white.withValues(alpha: 0.14);
+final Color kGlassSurfaceStrong = Colors.white.withValues(alpha: 0.2);
+final Color kGlassStroke = Colors.white.withValues(alpha: 0.16);
+final Color kMutedText = Colors.white.withValues(alpha: 0.72);
 
 class PlanoraTheme {
   const PlanoraTheme._();
 
   static ThemeData build() {
     final TextTheme textTheme = TextTheme(
-      displayLarge: GoogleFonts.plusJakartaSans(
-        fontSize: 32,
+      displayLarge: GoogleFonts.spectral(
+        fontSize: 40,
         fontWeight: FontWeight.w700,
         color: Colors.white,
+        height: 0.96,
       ),
-      titleLarge: GoogleFonts.inter(
-        fontSize: 22,
+      titleLarge: GoogleFonts.spectral(
+        fontSize: 28,
         fontWeight: FontWeight.w700,
         color: Colors.white,
+        height: 1,
       ),
-      titleMedium: GoogleFonts.inter(
+      titleMedium: GoogleFonts.ibmPlexSans(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: Colors.white,
+        letterSpacing: 0.1,
       ),
-      bodyLarge: GoogleFonts.inter(
-        fontSize: 16,
+      bodyLarge: GoogleFonts.ibmPlexSans(
+        fontSize: 15,
         fontWeight: FontWeight.w400,
         color: Colors.white,
+        height: 1.45,
       ),
-      bodyMedium: GoogleFonts.inter(
-        fontSize: 14,
+      bodyMedium: GoogleFonts.ibmPlexSans(
+        fontSize: 13.5,
         fontWeight: FontWeight.w400,
         color: Colors.white,
+        height: 1.4,
       ),
-      labelLarge: GoogleFonts.inter(
-        fontSize: 16,
+      labelLarge: GoogleFonts.ibmPlexSans(
+        fontSize: 15,
         fontWeight: FontWeight.w600,
         color: kDark,
+        letterSpacing: 0.2,
+      ),
+      labelMedium: GoogleFonts.ibmPlexSans(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+        letterSpacing: 0.8,
       ),
     );
 
@@ -84,12 +102,14 @@ class PlanoraTheme {
         foregroundColor: Colors.white,
         centerTitle: false,
       ),
+      iconTheme: const IconThemeData(color: Colors.white),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: kLavender,
-          foregroundColor: kDark,
+          backgroundColor: kLavenderBright,
+          foregroundColor: kInk,
           textStyle: textTheme.labelLarge,
           minimumSize: const Size.fromHeight(56),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: kButtonRadius),
           elevation: kElevation,
         ),
@@ -97,7 +117,10 @@ class PlanoraTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: kInputBg,
-        hintStyle: GoogleFonts.inter(fontSize: 14, color: kInputHintColor),
+        hintStyle: GoogleFonts.ibmPlexSans(
+          fontSize: 14,
+          color: kInputHintColor,
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 24,
           vertical: 18,
@@ -123,6 +146,43 @@ class PlanoraTheme {
           borderSide: const BorderSide(color: kError),
         ),
       ),
+      checkboxTheme: CheckboxThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+        side: WidgetStateBorderSide.resolveWith(
+          (Set<WidgetState> states) => BorderSide(
+            color: states.contains(WidgetState.selected)
+                ? kLavenderBright
+                : Colors.white.withValues(alpha: 0.28),
+            width: 1.25,
+          ),
+        ),
+        fillColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return kLavenderBright;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: const WidgetStatePropertyAll<Color>(kInk),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: kLavenderBright,
+          textStyle: textTheme.labelMedium,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: Colors.white.withValues(alpha: 0.1),
+        disabledColor: Colors.white.withValues(alpha: 0.08),
+        selectedColor: kLavenderBright,
+        secondarySelectedColor: kLavenderBright,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        labelStyle: textTheme.bodyMedium ?? const TextStyle(),
+        secondaryLabelStyle: textTheme.bodyMedium?.copyWith(color: kInk),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: kDark,
         selectedItemColor: kLavender,
@@ -130,6 +190,9 @@ class PlanoraTheme {
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
         elevation: 0,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: kLavenderBright,
       ),
     );
   }
