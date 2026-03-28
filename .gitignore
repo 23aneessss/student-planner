@@ -18,8 +18,8 @@ migrate_working_dir/
 *.iws
 .idea/
 
-.agent/
-.skills/
+agent/
+skills/
 
 
 # The .vscode folder contains launch configuration and tasks you configure in
