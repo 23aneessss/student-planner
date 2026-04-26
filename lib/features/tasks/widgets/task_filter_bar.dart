@@ -28,50 +28,48 @@ class TaskFilterBar extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: <Widget>[
-                _chip(
-                  context,
-                  'All',
-                  selectedStatus == null,
-                  () => onStatusChanged(null),
+                _GlassChip(
+                  label: 'All',
+                  selected: selectedStatus == null,
+                  onTap: () => onStatusChanged(null),
                 ),
-                _chip(
-                  context,
-                  'Todo',
-                  selectedStatus == TaskStatus.todo,
-                  () => onStatusChanged(TaskStatus.todo),
+                _GlassChip(
+                  label: 'Todo',
+                  selected: selectedStatus == TaskStatus.todo,
+                  onTap: () => onStatusChanged(TaskStatus.todo),
                 ),
-                _chip(
-                  context,
-                  'In Progress',
-                  selectedStatus == TaskStatus.inProgress,
-                  () => onStatusChanged(TaskStatus.inProgress),
+                _GlassChip(
+                  label: 'In progress',
+                  selected: selectedStatus == TaskStatus.inProgress,
+                  onTap: () => onStatusChanged(TaskStatus.inProgress),
                 ),
-                _chip(
-                  context,
-                  'Done',
-                  selectedStatus == TaskStatus.done,
-                  () => onStatusChanged(TaskStatus.done),
+                _GlassChip(
+                  label: 'Done',
+                  selected: selectedStatus == TaskStatus.done,
+                  onTap: () => onStatusChanged(TaskStatus.done),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 12),
-        DecoratedBox(
+        const SizedBox(width: 10),
+        Container(
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: kCardSurface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: kCardBorder),
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<TaskSort>(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
               value: sort,
-              dropdownColor: kCardSurface,
-              iconEnabledColor: kCardText,
+              dropdownColor: kInk,
+              iconEnabledColor: Colors.white,
+              borderRadius: BorderRadius.circular(18),
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(color: kCardText),
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white),
               items: const <DropdownMenuItem<TaskSort>>[
                 DropdownMenuItem(
                   value: TaskSort.dueDate,
@@ -94,26 +92,49 @@ class TaskFilterBar extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _chip(
-    BuildContext context,
-    String label,
-    bool selected,
-    VoidCallback onTap,
-  ) {
+class _GlassChip extends StatelessWidget {
+  const _GlassChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: selected,
-        selectedColor: kLavenderBright,
-        backgroundColor: kCardSurface,
-        side: const BorderSide(color: kCardBorder),
-        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: selected ? kInk : kCardText,
-          fontWeight: FontWeight.w600,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected
+                ? kLavenderBright
+                : Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected
+                  ? Colors.white.withValues(alpha: 0.6)
+                  : Colors.white.withValues(alpha: 0.14),
+            ),
+          ),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: selected ? kInk : Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
-        onSelected: (_) => onTap(),
       ),
     );
   }

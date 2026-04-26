@@ -8,6 +8,7 @@ import '../../core/widgets/cloud_decoration.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/gradient_scaffold.dart';
 import '../../core/widgets/planora_input.dart';
+import '../../core/widgets/planora_screen_header.dart';
 import '../../domain/models/task.dart';
 import '../../providers/tasks_provider.dart';
 import '../../theme/tokens.dart';
@@ -26,33 +27,19 @@ class TasksScreen extends ConsumerWidget {
     return GradientScaffold(
       clouds: const <CloudPosition>[CloudPosition.topRight],
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 110),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  'Tasks',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              InkWell(
-                borderRadius: BorderRadius.circular(999),
-                onTap: () => context.go('/tasks/new'),
-                child: Ink(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: kCardSurface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: kCardBorder),
-                  ),
-                  child: const Icon(Icons.add_rounded, color: kInk),
-                ),
-              ),
-            ],
+          PlanoraScreenHeader(
+            eyebrow: 'Plan',
+            title: 'Tasks',
+            subtitle: 'Stay on top of every deadline.',
+            action: PlanoraHeaderAction(
+              icon: Icons.add_rounded,
+              tooltip: 'New task',
+              onTap: () => context.go('/tasks/new'),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           TaskFilterBar(
             selectedStatus: status,
             onStatusChanged: (TaskStatus? value) =>
@@ -61,7 +48,7 @@ class TasksScreen extends ConsumerWidget {
             onSortChanged: (TaskSort value) =>
                 ref.read(taskSortProvider.notifier).state = value,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           PlanoraTextField(
             hint: 'Search tasks',
             prefixIcon: const Icon(Icons.search),
@@ -72,9 +59,12 @@ class TasksScreen extends ConsumerWidget {
           tasksAsync.when(
             data: (List<Task> tasks) {
               if (tasks.isEmpty) {
-                return const EmptyState(
-                  title: 'No tasks match this view.',
-                  subtitle: 'Try another filter or create a fresh task.',
+                return const Padding(
+                  padding: EdgeInsets.only(top: 40),
+                  child: EmptyState(
+                    title: 'No tasks match this view.',
+                    subtitle: 'Try another filter or create a fresh task.',
+                  ),
                 );
               }
               final Map<String, List<Task>> grouped = <String, List<Task>>{};
@@ -97,11 +87,39 @@ class TasksScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          heading,
-                          style: Theme.of(context).textTheme.titleMedium,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4, bottom: 12),
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: kLavenderBright,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                heading,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                '${entry.value.length} task${entry.value.length == 1 ? '' : 's'}',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.labelMedium?.copyWith(
+                                  color: kMutedText,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 12),
                         ...entry.value.map(
                           (Task task) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
@@ -109,13 +127,13 @@ class TasksScreen extends ConsumerWidget {
                               key: ValueKey<String>(task.id),
                               background: _dismissBackground(
                                 context,
-                                color: Colors.green,
+                                color: kSuccess,
                                 icon: Icons.check_rounded,
                                 alignment: Alignment.centerLeft,
                               ),
                               secondaryBackground: _dismissBackground(
                                 context,
-                                color: Colors.redAccent,
+                                color: kError,
                                 icon: Icons.delete_rounded,
                                 alignment: Alignment.centerRight,
                               ),
@@ -149,7 +167,10 @@ class TasksScreen extends ConsumerWidget {
                 }).toList(),
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Padding(
+              padding: EdgeInsets.only(top: 60),
+              child: Center(child: CircularProgressIndicator()),
+            ),
             error: (Object error, StackTrace stackTrace) =>
                 Text(error.toString()),
           ),
@@ -167,10 +188,10 @@ class TasksScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       alignment: alignment,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 22),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: kCardRadius,
       ),
       child: Icon(icon, color: Colors.white),
     );
