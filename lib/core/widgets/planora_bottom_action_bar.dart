@@ -33,18 +33,35 @@ class PlanoraBottomActionBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 22),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List<Widget>.generate(items.length, (int index) {
-            final PlanoraNavItem item = items[index];
-            final bool isSelected = index == currentIndex;
-            return _PlanoraNavButton(
-              item: item,
-              isSelected: isSelected,
-              onTap: () => onSelected(index),
-            );
-          }),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFFD5C1FF).withValues(alpha: 0.92),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 30,
+                offset: const Offset(0, 16),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List<Widget>.generate(items.length, (int index) {
+                final PlanoraNavItem item = items[index];
+                final bool isSelected = index == currentIndex;
+                return _PlanoraNavButton(
+                  item: item,
+                  isSelected: isSelected,
+                  onTap: () => onSelected(index),
+                );
+              }),
+            ),
+          ),
         ),
       ),
     );
@@ -68,52 +85,39 @@ class _PlanoraNavButton extends StatelessWidget {
       assetPath: item.assetPath,
       fallbackIcon: item.fallbackIcon,
       size: 22,
-      color: isSelected ? kDark : Colors.white,
     );
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 240),
+      duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
-      height: 52,
-      width: isSelected ? 124 : 52,
+      height: 48,
+      width: isSelected ? 108 : 48,
       decoration: BoxDecoration(
-        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(
-          color: isSelected
-              ? Colors.white.withValues(alpha: 0.85)
-              : Colors.white.withValues(alpha: 0.12),
-          width: 1,
-        ),
+        color: Colors.white.withValues(alpha: isSelected ? 1 : 0.88),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: isSelected
             ? <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.22),
-                  blurRadius: 22,
-                  offset: const Offset(0, 12),
-                ),
-              ]
-            : <BoxShadow>[
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.14),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 14,
                   offset: const Offset(0, 8),
                 ),
-              ],
+              ]
+            : null,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(24),
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isSelected ? 14 : 0),
+            padding: EdgeInsets.symmetric(horizontal: isSelected ? 12 : 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 icon,
                 if (isSelected) ...<Widget>[
-                  const SizedBox(width: 9),
+                  const SizedBox(width: 8),
                   Flexible(
                     child: Text(
                       item.label,
@@ -121,8 +125,7 @@ class _PlanoraNavButton extends StatelessWidget {
                       softWrap: false,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: kDark,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.1,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -141,13 +144,11 @@ class _NavAssetIcon extends StatelessWidget {
     required this.assetPath,
     required this.fallbackIcon,
     required this.size,
-    required this.color,
   });
 
   final String assetPath;
   final IconData fallbackIcon;
   final double size;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +156,10 @@ class _NavAssetIcon extends StatelessWidget {
       assetPath,
       width: size,
       height: size,
-      color: color,
+      color: kDark,
       fit: BoxFit.contain,
       errorBuilder: (BuildContext _, Object error, StackTrace? stackTrace) =>
-          Icon(fallbackIcon, size: size, color: color),
+          Icon(fallbackIcon, size: size, color: kDark),
     );
   }
 }
