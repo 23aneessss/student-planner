@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/cloud_decoration.dart';
 import '../../core/widgets/gradient_scaffold.dart';
+import '../../core/widgets/planora_screen_header.dart';
 import '../../data/local/database.dart' hide Task;
 import '../../domain/models/task.dart';
 import '../../providers/app_providers.dart';
@@ -21,70 +22,32 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthState? auth = ref.watch(authProvider).valueOrNull;
     final user = auth?.user;
+    final DateTime? lastSync = ref.watch(syncProvider).lastSyncedAt;
+    final String lastSyncLabel = lastSync == null
+        ? 'Not synced yet'
+        : 'Synced ${_relativeTime(lastSync)}';
 
     return GradientScaffold(
-      appBar: AppBar(title: const Text('Profile')),
       clouds: const <CloudPosition>[CloudPosition.topRight],
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              CircleAvatar(
-                radius: 34,
-                backgroundColor: Colors.transparent,
-                child: Container(
-                  width: 68,
-                  height: 68,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: kLavender, width: 2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: user?.avatarUrl != null
-                        ? CachedNetworkImage(
-                            imageUrl: user!.avatarUrl!,
-                            fit: BoxFit.cover,
-                            errorWidget:
-                                (BuildContext _, String url, Object error) =>
-                                    _initials(user.fullName),
-                          )
-                        : _initials(user?.fullName ?? 'PL'),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      user?.fullName ?? 'PLANORA Student',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      user?.email ?? 'No email',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user?.scholarYear ?? 'Student',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: kLavender),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          const PlanoraScreenHeader(eyebrow: 'You', title: 'Profile'),
+          const SizedBox(height: 20),
+          _ProfileHero(
+            name: user?.fullName ?? 'PLANORA Student',
+            email: user?.email ?? 'No email',
+            year: user?.scholarYear ?? 'Student',
+            avatarUrl: user?.avatarUrl,
+            lastSyncLabel: lastSyncLabel,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           _Section(
-            title: 'Settings',
+            title: 'Preferences',
             child: Column(
               children: <Widget>[
                 SwitchListTile.adaptive(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   value: user?.notificationsEnabled ?? true,
                   title: const Text('Notifications'),
                   subtitle: const Text('Task reminders and Pomodoro alerts'),
@@ -98,14 +61,12 @@ class ProfileScreen extends ConsumerWidget {
                     }
                   },
                 ),
+                const _Divider(),
                 SwitchListTile.adaptive(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   value: user?.syncEnabled ?? true,
-                  title: const Text('Sync'),
-                  subtitle: Text(
-                    ref.watch(syncProvider).lastSyncedAt == null
-                        ? 'Not synced yet'
-                        : 'Last sync: ${ref.watch(syncProvider).lastSyncedAt}',
-                  ),
+                  title: const Text('Cloud sync'),
+                  subtitle: Text(lastSyncLabel),
                   onChanged: (bool value) {
                     if (user != null) {
                       ref
@@ -114,70 +75,92 @@ class ProfileScreen extends ConsumerWidget {
                     }
                   },
                 ),
-                ListTile(
-                  title: const Text('Grade scale'),
-                  subtitle: Text(user?.gradeScale ?? '20'),
-                  trailing: SegmentedButton<String>(
-                    segments: const <ButtonSegment<String>>[
-                      ButtonSegment(value: '20', label: Text('20')),
-                      ButtonSegment(value: '100', label: Text('100')),
-                      ButtonSegment(value: '4.0', label: Text('4.0')),
+                const _Divider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Text(
+                        'Grade scale',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 10),
+                      SegmentedButton<String>(
+                        segments: const <ButtonSegment<String>>[
+                          ButtonSegment(value: '20', label: Text('/20')),
+                          ButtonSegment(value: '100', label: Text('/100')),
+                          ButtonSegment(value: '4.0', label: Text('GPA 4.0')),
+                        ],
+                        selected: <String>{user?.gradeScale ?? '20'},
+                        showSelectedIcon: false,
+                        onSelectionChanged: (Set<String> values) {
+                          if (user != null) {
+                            ref
+                                .read(authProvider.notifier)
+                                .updateProfile(
+                                  user.copyWith(gradeScale: values.first),
+                                );
+                          }
+                        },
+                      ),
                     ],
-                    selected: <String>{user?.gradeScale ?? '20'},
-                    onSelectionChanged: (Set<String> values) {
-                      if (user != null) {
-                        ref
-                            .read(authProvider.notifier)
-                            .updateProfile(
-                              user.copyWith(gradeScale: values.first),
-                            );
-                      }
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Import'),
-                  subtitle: const Text('Pick a CSV or ICS file'),
-                  trailing: IconButton(
-                    onPressed: () async {
-                      final String message = await ref
-                          .read(taskActionsProvider)
-                          .importTasks();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(message)));
-                      }
-                    },
-                    icon: const Icon(Icons.file_open_outlined),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Export'),
-                  subtitle: const Text('Generate tasks.csv and calendar.ics'),
-                  trailing: IconButton(
-                    onPressed: () async {
-                      final List<Task> tasks = await ref.read(
-                        rawTasksProvider.future,
-                      );
-                      await ref.read(taskActionsProvider).exportTasks(tasks);
-                    },
-                    icon: const Icon(Icons.ios_share_rounded),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           _Section(
-            title: 'Danger zone',
+            title: 'Data',
             child: Column(
               children: <Widget>[
                 ListTile(
-                  title: const Text('Delete all data'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.file_open_outlined),
+                  title: const Text('Import'),
+                  subtitle: const Text('CSV or ICS file'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () async {
+                    final String message = await ref
+                        .read(taskActionsProvider)
+                        .importTasks();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(message)));
+                    }
+                  },
+                ),
+                const _Divider(),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.ios_share_rounded),
+                  title: const Text('Export'),
+                  subtitle: const Text('Generate tasks.csv and calendar.ics'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () async {
+                    final List<Task> tasks = await ref.read(
+                      rawTasksProvider.future,
+                    );
+                    await ref.read(taskActionsProvider).exportTasks(tasks);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          _Section(
+            title: 'Account',
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.delete_outline_rounded),
                   textColor: kCoral,
                   iconColor: kCoral,
-                  trailing: const Icon(Icons.delete_outline_rounded),
+                  title: const Text('Delete all data'),
+                  subtitle: const Text('Wipes local database'),
                   onTap: () async {
                     final AppDatabase db = ref.read(appDatabaseProvider);
                     await db.transaction(() async {
@@ -196,11 +179,13 @@ class ProfileScreen extends ConsumerWidget {
                     }
                   },
                 ),
+                const _Divider(),
                 ListTile(
-                  title: const Text('Sign out'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.logout_rounded),
                   textColor: kCoral,
                   iconColor: kCoral,
-                  trailing: const Icon(Icons.logout_rounded),
+                  title: const Text('Sign out'),
                   onTap: () async {
                     await ref.read(authProvider.notifier).signOut();
                     if (context.mounted) {
@@ -216,21 +201,195 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  String _relativeTime(DateTime time) {
+    final Duration delta = DateTime.now().difference(time);
+    if (delta.inMinutes < 1) return 'just now';
+    if (delta.inMinutes < 60) return '${delta.inMinutes}m ago';
+    if (delta.inHours < 24) return '${delta.inHours}h ago';
+    return '${delta.inDays}d ago';
+  }
+}
+
+class _ProfileHero extends StatelessWidget {
+  const _ProfileHero({
+    required this.name,
+    required this.email,
+    required this.year,
+    required this.avatarUrl,
+    required this.lastSyncLabel,
+  });
+
+  final String name;
+  final String email;
+  final String year;
+  final String? avatarUrl;
+  final String lastSyncLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: kCardSurface,
+        borderRadius: kCardRadius,
+        border: Border.all(color: kCardBorder),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: kInk.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: <Color>[kLavenderBright, kLavender],
+                  ),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: kLavender.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: avatarUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: avatarUrl!,
+                          fit: BoxFit.cover,
+                          errorWidget:
+                              (BuildContext _, String url, Object error) =>
+                                  _initials(name),
+                        )
+                      : _initials(name),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      name,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: kCardText,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: kCardSubtext,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: <Widget>[
+              _Tag(
+                icon: Icons.school_outlined,
+                label: year,
+                accent: kLavender,
+              ),
+              const SizedBox(width: 8),
+              _Tag(
+                icon: Icons.cloud_sync_outlined,
+                label: lastSyncLabel,
+                accent: kSuccess,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _initials(String name) {
     final List<String> parts = name.trim().split(RegExp(r'\s+'));
     final String initials = parts
         .take(2)
+        .where((String part) => part.isNotEmpty)
         .map((String part) => part[0])
         .join()
         .toUpperCase();
     return Center(
       child: Text(
-        initials,
+        initials.isEmpty ? 'PL' : initials,
         style: const TextStyle(
           color: Colors.white,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
+          fontSize: 20,
         ),
       ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  const _Tag({required this.icon, required this.label, required this.accent});
+
+  final IconData icon;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(icon, size: 14, color: accent),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 1,
+      color: kCardBorder,
     );
   }
 }
@@ -255,18 +414,19 @@ class _Section extends StatelessWidget {
           listTileTheme: const ListTileThemeData(
             textColor: kCardText,
             iconColor: kCardText,
+            subtitleTextStyle: TextStyle(color: kCardSubtext, fontSize: 12),
           ),
           segmentedButtonTheme: SegmentedButtonThemeData(
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return kCoral;
+                  return kLavenderBright;
                 }
                 return kCardSurfaceSoft;
               }),
               foregroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
+                  return kInk;
                 }
                 return kCardText;
               }),
@@ -276,12 +436,7 @@ class _Section extends StatelessWidget {
             ),
           ),
           switchTheme: SwitchThemeData(
-            thumbColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Colors.white;
-              }
-              return Colors.white;
-            }),
+            thumbColor: const WidgetStatePropertyAll(Colors.white),
             trackColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
                 return kSuccess;
@@ -298,15 +453,17 @@ class _Section extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
                 child: Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: kCardText),
+                  title.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: kCardSubtext,
+                    letterSpacing: 1.4,
+                  ),
                 ),
               ),
               child,
+              const SizedBox(height: 6),
             ],
           ),
         ),
